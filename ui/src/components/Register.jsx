@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from 'axios';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -18,7 +19,9 @@ const Register = () => {
       navigate("/profile");
     }
   }, [navigate]);
-
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState(1);
+  const [message, setMessage] = useState('');
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -45,14 +48,34 @@ const Register = () => {
       setErrors(validationErrors);
       return;
     }
-     navigate("/verification");
-
-    // const formData = new FormData();
-    // formData.append("username", username);
-    // formData.append("email", email);
-    // formData.append("phone", phone);
-    // formData.append("companyname", companyname);
-
+    const handleSendEmailOtp = async () => {
+        try {
+          const response = await axios.post('http://localhost:3000/send-email-otp', { email });
+          setMessage(response.data.message);
+          setStep(2);  // Move to OTP input step
+        } catch (error) {
+          setMessage('Error sending OTP: ' + error.response.data.message);
+        }
+      };
+    
+      const handleSendPhoneOtp = async () => {
+        try {
+          const response = await axios.post('http://localhost:3000/send-phone-otp', { phone });
+          setMessage(response.data.message);
+          setStep(2);  // Move to OTP input step
+        } catch (error) {
+          setMessage('Error sending OTP: ' + error.response.data.message);
+        }
+      };
+    //  navigate("/verification");
+      handleSendEmailOtp();
+    //   handleSendPhoneOtp();
+      const formData = new FormData();
+    formData.append("username", username);
+    formData.append("email", email);
+    formData.append("phone", phone);
+    formData.append("companyname", companyname);
+console.log(username,phone,companyname,email)
     // const response = await fetch("/api/signup", {
     //   method: "POST",
     //   body: formData,
@@ -67,14 +90,27 @@ const Register = () => {
     //   }, 2000); // Give time for toast to be visible before navigating
     // } else {
     //   toast.error(data.error || "An error occurred during registration");
-    // }
+      // }
+
+    
+      const handleVerifyOtp = async () => {
+        try {
+          const response = await axios.post('http://localhost:3000/verify-otp', {
+            emailOrPhone: email || phone,
+            otp
+          });
+          setMessage(response.data.message);
+        } catch (error) {
+          setMessage('Error verifying OTP: ' + error.response.data.message);
+        }
+      };
   };
 
   return (
     <div className="h-[100vh] items-center flex justify-center px-5 lg:px-0">
       <div className="max-w-screen-xl bg-white border shadow-2xl sm:rounded-lg flex justify-center h-[700px] flex-1">
         <div className="flex-1 bg-white-900 text-center hidden md:flex">
-          <div className="p-60">Lorem Ipsum is simply dummy text of the printing and  typesetting industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever since the 1500s, when an unknown printer took a galley</div>
+          <div className="p-40">Lorem Ipsum is simply dummy text of the printing and  typesetting industry. Lorem Ipsum has been the industry&apos;s standard dummy text ever since the 1500s, when an unknown printer took a galley</div>
         </div>
         <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
           <div className="flex flex-col items-center">
