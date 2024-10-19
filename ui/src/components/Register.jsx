@@ -67,9 +67,9 @@ const Register = () => {
           setMessage('Error sending OTP: ' + error.response.data.message);
         }
       };
-    //  navigate("/verification");
+      navigate("/verification");
       handleSendEmailOtp();
-    //   handleSendPhoneOtp();
+       handleSendPhoneOtp();
       const formData = new FormData();
     formData.append("username", username);
     formData.append("email", email);
